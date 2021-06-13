@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synthetic division</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        td,
+        input {
+            width: 10ch;
+            height: 1em;
+        }
+
+        td:first-child {
+            border-right: 2px solid black;
+        }
+
+        tr:last-child td {
+            border-top: 1px solid black;
+        }
+
+        td:first-child {
+            border-top: 0 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="add">Add</button>
+    <button id="delete">Delete</button>
+    <button id="calculate">Calculate</button>
+    <table>
+        <tr>
+            <td></td>
+            <td>
+                <input type="text" value="1">
+            </td>
+            <td>
+                <input type="text" value="-2">
+            </td>
+            <td>
+                <input type="text" value="1">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="text" value="1">
+            </td>
+            <td>
+                <input type="text" disabled>
+            </td>
+            <td>
+                <input type="text" disabled>
+            </td>
+            <td>
+                <input type="text" disabled>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <input type="text" disabled>
+            </td>
+            <td>
+                <input type="text" disabled>
+            </td>
+            <td>
+                <input type="text" disabled>
+            </td>
+        </tr>
+    </table>
+    <script>
+        var n = 3;
+        function lastElement(e) {
+            return [...e.children].slice(-1)[0];
+        }
+        document.getElementById("add").addEventListener("click", () => {
+            ++n;
+            for (let tr of document.getElementsByTagName("tr")) {
+                tr.appendChild(lastElement(tr).cloneNode(true));
+                [...lastElement(tr).getElementsByTagName("input")].forEach(e => { e.value = ""; });
+            }
+        });
+        document.getElementById("delete").addEventListener("click", () => {
+            if (n <= 2) return;
+            --n;
+            for (let tr of document.getElementsByTagName("tr"))
+                lastElement(tr).remove();
+        });
+        document.getElementById("calculate").addEventListener("click", () => {
+            let [first, second, third] = document.getElementsByTagName("tr");
+            let unwrap = (e, i) => e.children[i].children[0];
+            let root = +unwrap(second, 0).value;
+            unwrap(second, 1).value = "\u2193";;
+            unwrap(third, 1).value = unwrap(first, 1).value;
+            for (let i = 2; i <= n; ++i) {
+                unwrap(second, i).value = root * unwrap(third, i - 1).value;
+                unwrap(third, i).value = (+unwrap(first, i).value) + (+unwrap(second, i).value);
+            }
+        });
+        [...document.getElementsByTagName("input")].forEach(e => e.addEventListener("input", () =>
+            [...document.getElementsByTagName("input")].forEach(e => { if (e.disabled) e.value = ""; })));
+    </script>
+</body>
+
+</html>
